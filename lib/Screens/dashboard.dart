@@ -4,7 +4,9 @@ import 'package:snt_gold_project/Screens/cart.dart';
 import 'package:snt_gold_project/Model/category_model.dart';
 import 'package:snt_gold_project/Screens/favorite.dart';
 import 'package:snt_gold_project/Dashboard/products.dart';
+import 'package:snt_gold_project/Screens/help_screen.dart';
 import 'package:snt_gold_project/Screens/profile_screen.dart';
+import 'package:snt_gold_project/Screens/settings_screen.dart';
 import 'package:snt_gold_project/Screens/shopping.dart';
 import 'package:snt_gold_project/Product_List/new_product.dart';
 
@@ -86,23 +88,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.home),
-                title: const Text('Home'),
+                title: const Text('Orders'),
                 onTap: () {
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('Profile'),
+                title: const Text('Help'),
                 onTap: () {
-                  Navigator.pop(context);
+                  //Navigator.pop(context);
+                  Navigator.push(context, 
+                  MaterialPageRoute(builder: (context) => const HelpScreen()));
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
+                title: const Text('Policy Terms'),
                 onTap: () {
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context)=> const PolicyTerms()));
                 },
               ),
               ListTile(
@@ -156,6 +161,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+
+class PolicyTerms extends StatelessWidget{
+  const PolicyTerms({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Policy Terms'),
+      ),
+      body: const Center(child: Text('Policy Terms', style: TextStyle(fontSize: 24),)),
+    );
+  }
+  
+ 
+}
+
+
+class ReportProblemScreen extends StatelessWidget {
+  const ReportProblemScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Report a Problem'),
+      ),
+      body: const Center(
+        child: Text('Report a Problem form will be displayed here.', style: TextStyle(fontSize: 24)),
+      ),
+    );
+  }
+}
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -351,6 +390,146 @@ class CategoriesPage extends StatelessWidget {
             child: CategoryList(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+// class ShoppingPage extends StatelessWidget {
+//   const ShoppingPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Card(
+//       elevation: 3,
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Stack(
+//             children: [
+//               Container(
+//                 height: 150,
+//                 decoration: BoxDecoration(
+//                   color: Colors.grey.shade200,
+//                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+//                 ),
+//               ),
+//               Positioned(
+//                 top: 10,
+//                 left: 10,
+//                 child: Container(
+//                   padding: const EdgeInsets.all(4),
+//                   color: Colors.black,
+//                   child: const Text(
+//                     '30% OFF',
+//                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//           const Padding(
+//             padding: EdgeInsets.all(8.0),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   'Product Name Goes Here',
+//                   style: TextStyle(fontWeight: FontWeight.bold),
+//                 ),
+//                 Text(
+//                   '₹ 25,652',
+//                   style: TextStyle(color: Colors.grey),
+//                 ),
+//                 Text(
+//                   'Women | Diamond Ring',
+//                   style: TextStyle(color: Colors.grey),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           const Padding(
+//             padding: EdgeInsets.all(8.0),
+//             child: Row(
+//               mainAxisAlignment: MainAxisAlignment.end,
+//               children: [
+//                 Icon(Icons.favorite, size: 20, color: Colors.grey),
+//                 SizedBox(width: 4),
+//                 Text('4.7K'),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+class Cart extends StatelessWidget {
+  const Cart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        elevation: 2,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              // Product Image
+              Image.asset('assets/ring.jpg',
+                width: 80,
+                height: 80,
+              ),
+              const SizedBox(width: 16.0),
+
+              // Product Details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Gold Necklace",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text("\$1500", style: TextStyle(fontSize: 16, color: Colors.amber[600])),
+                  ],
+                ),
+              ),
+
+              // Quantity Selector
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      // Decrease quantity
+                    },
+                    icon: const Icon(Icons.remove),
+                  ),
+                  const Text("1"), // Display quantity
+                  IconButton(
+                    onPressed: () {
+                      // Increase quantity
+                    },
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+
+              // Remove Button
+              IconButton(
+                onPressed: () {
+                  // Remove item from cart
+                },
+                icon: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

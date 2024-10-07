@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:snt_gold_project/Dashboard/dashboard.dart';
+import 'package:snt_gold_project/Screens/dashboard.dart';
 import 'package:snt_gold_project/Login_Registration/registration.dart';
 
 class LoginScreen extends StatefulWidget {

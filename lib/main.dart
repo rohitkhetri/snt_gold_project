@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:snt_gold_project/Model/cart_model.dart';
+import 'package:snt_gold_project/Provider/ProductProvider.dart';
+import 'package:snt_gold_project/Provider/FavoriteProvider.dart';
 import 'package:snt_gold_project/Splash%20Screen/splash_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers:
+      [
+      ChangeNotifierProvider(create: (context) => CartModel()),
+      ChangeNotifierProvider(create: (context) => Productprovider()),
+      ChangeNotifierProvider(create: (context) => Favoriteprovider()),
+    ],
+    child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

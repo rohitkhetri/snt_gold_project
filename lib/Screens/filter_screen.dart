@@ -1,41 +1,92 @@
-
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:snt_gold_project/Product_List/all_products.dart'; // Ensure this path is correct
 
 class FilterScreen extends StatefulWidget {
-  const FilterScreen({super.key});
+  final List<Product> allProducts;
+  final Function(List<Product>) onFiltersApplied;
+  const FilterScreen({super.key, required this.allProducts, required this.onFiltersApplied});
 
   @override
   _FilterScreenState createState() => _FilterScreenState();
 }
 
 class _FilterScreenState extends State<FilterScreen> {
-  // List of main categories for the left side
   final List<String> categories = [
     "Price",
     "Brands",
-    "Occasion",
-    "Discount"
+    "Size",
+    "Weight",
+    "Category",
+    "Subcategory"
   ];
 
-  // Subcategories for each main category
   Map<String, List<String>> subcategories = {
-    "Price": ["Under 1000", "1000 - 5000", "Above 5000"],
-    "Brands": ["Tanishq", "Reliance Jewels", "CaratLane", "BlueStone", "Kalyan Jewellers"],
-    "Occasion": ["Wedding", "Casual", "Party"],
-    "Discount": ["10% Off", "20% Off", "30% Off"],
+    "Price": ["0-10000", "10000 - 20000", "20000 - 30000", "30000 - 40000", "40000 - 50000", "Above 50000"],
+    "Brands": ["1"], // Replace with actual brand names
+    "Size": ["1","2"], // Replace with actual size options
+    "Weight": ["1","2"], // Replace with actual weight options
+    "Category": ["3", "2", "1"], // Replace with actual category options
+    "Subcategory": ["8", "7", "2", "5", "6", "11", "3", "4", "1"], // Replace with actual subcategory options
   };
 
-  // Keep track of the selected category
   String selectedCategory = "Price"; // Default to Price
-
-  // Keep track of selected subcategories (can be different for each category)
   Map<String, Set<String>> selectedSubcategories = {
     "Price": {},
     "Brands": {},
-    "Occasion": {},
-    "Discount": {},
+    "Size": {},
+    "Weight": {},
+    "Category": {},
+    "Subcategory": {},
   };
 
+  bool _isLoading = true;
+
+  // Function to apply filters and fetch filtered products
+  Future<void> _fetchFilters() async {
+    const url = 'https://sntgold.microlanpos.com/api/filter-product-page';
+
+    try {
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body)['for_filter_product_data'];
+        setState(() {
+          // Map the response to the subcategories
+          subcategories = {
+            "Price": jsonData['price'].map<String>((item) => item.toString()).toList(),
+            "Brands": jsonData['brand'].map<String>((item) => item['name']).toList(),
+            "Size": jsonData['carat'].map<String>((item) => item['name']).toList(),
+            "Weight": jsonData['weight'].map<String>((item) => item['name']).toList(),
+            "Category": jsonData['category'].map<String>((item) => item['name']).toList(),
+            "Subcategory": jsonData['subcategory'].map<String>((item) => item['subcategories']).toList(),
+          };
+          _isLoading = false; // Set loading to false
+        });
+      } else {
+        throw Exception('Failed to load filters: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false; // Set loading to false on error
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+    
+  }
+
+  void applyFilters() {
+    // Implement your filter application logic here
+    print("Filters applied: $selectedSubcategories");
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,11 +97,9 @@ class _FilterScreenState extends State<FilterScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            // Top Section: Filters (Left and Right panels)
             Expanded(
               child: Row(
                 children: [
-                  // Left side: List of main categories
                   Expanded(
                     flex: 2,
                     child: ListView(
@@ -75,24 +124,19 @@ class _FilterScreenState extends State<FilterScreen> {
                       }).toList(),
                     ),
                   ),
-
-                  // Right side: List of subcategories based on selected category
                   Expanded(
                     flex: 5,
                     child: ListView(
                       children: subcategories[selectedCategory]!.map((subcategory) {
                         return CheckboxListTile(
                           title: Text(subcategory),
-                          value: selectedSubcategories[selectedCategory]!
-                              .contains(subcategory),
+                          value: selectedSubcategories[selectedCategory]!.contains(subcategory),
                           onChanged: (bool? value) {
                             setState(() {
                               if (value!) {
-                                selectedSubcategories[selectedCategory]!
-                                    .add(subcategory);
+                                selectedSubcategories[selectedCategory]!.add(subcategory);
                               } else {
-                                selectedSubcategories[selectedCategory]!
-                                    .remove(subcategory);
+                                selectedSubcategories[selectedCategory]!.remove(subcategory);
                               }
                             });
                           },
@@ -103,8 +147,6 @@ class _FilterScreenState extends State<FilterScreen> {
                 ],
               ),
             ),
-
-            // Bottom Section: Reset and Apply Filter Buttons
             Row(
               children: [
                 Expanded(
@@ -124,8 +166,8 @@ class _FilterScreenState extends State<FilterScreen> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Apply the filter logic here (use selectedSubcategories for this)
-                      //print(selectedSubcategories);
+                      _fetchFilters();
+                      Navigator.pop(context); // Call the apply filters function
                     },
                     child: const Text("Apply Filter"),
                   ),

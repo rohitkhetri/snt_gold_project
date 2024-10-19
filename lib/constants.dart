@@ -1,8 +1,8 @@
 
 import 'dart:ui';
 
-const productDemoImg1 = 'assets.ring.jpg';
-const productDemoImg2 = 'assets.ring.jpg';
+// const productDemoImg1 = 'assets.ring.jpg';
+// const productDemoImg2 = 'assets.ring.jpg';
 
 
 const Color primary = Color(0xFF1FCC79);

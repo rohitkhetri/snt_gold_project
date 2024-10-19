@@ -1,34 +1,30 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:snt_gold_project/Product_List/all_products.dart';
+import 'package:snt_gold_project/Screens/Details%20Screen/subcategory_product_list.dart';
 
-// ignore: must_be_immutable
+// Main Category List Widget
 class CategoryList extends StatelessWidget {
-  List<CategoryModel> demoCategories = [
+  final List<CategoryModel> demoCategories = [
     CategoryModel(
       title: "Rings",
       img: 'assets/ring.jpg',
-      subcategories: {
-        "Diamond Rings": 'assets/diamong_ring.png',
-        "Gold Rings": 'assets/gold_ring.webp',
-        "Platinum Rings" : 'assets/platinum_ring.png'}),
+      subcategories: [
+        Subcategory(id: 1, name: "Diamond Rings", image: 'assets/diamong_ring.png'),
+        Subcategory(id: 2, name: "Gold Rings", image: 'assets/gold_ring.webp'),
+        Subcategory(id: 3, name: "Platinum Rings", image: 'assets/platinum_ring.png'),
+      ],
+    ),
     CategoryModel(
       title: "Pendants",
       img: 'assets/pendants.jpeg',
-      subcategories:{
-        "Gold Pendants":'assets/pendant.webp',
-        "Silver Pendants":'assets/silver_pendant.png',
-        "Diamond Pendants":'assets/diamong_pendant.png'}),
-    CategoryModel(
-      title:"NosePins",
-      img: 'assets/nosepin_gold.png',
-      subcategories:{
-        "Diamond Nosepins":'assets/nosepin_diamond.png',
-        "Gold Nosepins": 'assets/nosepin_gold.png'}),
-    CategoryModel(
-      title: "Earrings",
-      img: 'assets/earring_gold.png',
-      subcategories:{
-        "Gold Earrings": 'assets/earring_gold1.png',
-        "Diamond Earrings": 'assets/earring_diamond.png'}),
+      subcategories: [
+        Subcategory(id: 5, name: "Gold Pendants", image: 'assets/pendant.webp'),
+        Subcategory(id: 7, name: "Silver Pendants", image: 'assets/silver_pendant.png'),
+        Subcategory(id: 8, name: "Diamond Pendants", image: 'assets/diamong_pendant.png'),
+      ],
+    ),
   ];
 
   CategoryList({super.key});
@@ -43,25 +39,45 @@ class CategoryList extends StatelessWidget {
     );
   }
 }
-
-
-class CategoryModel {
-  final String title;
-  //final IconData icon;
-  final String img;
-  final Map<String, String> subcategories;
-
-  CategoryModel({
-    required this.img,
-    required this.title,
-    required this.subcategories});
-}
-
-
-class CategoryTile extends StatelessWidget {
+class CategoryTile extends StatefulWidget {
   final CategoryModel category;
 
   const CategoryTile({super.key, required this.category});
+
+  @override
+  _CategoryTileState createState() => _CategoryTileState();
+}
+
+class _CategoryTileState extends State<CategoryTile> {
+  // List<Product> _products = []; // To store fetched products
+  bool _isLoading = false; // To manage loading state
+
+  // Function to fetch products for a specific subcategory
+  Future<List<Product>> _fetchProducts(int subcategoryId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('https://sntgold.microlanpos.com/api/product_list'),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        List<dynamic> productsJson = data['product'];
+
+        // Filter products based on the subcategory ID
+        List<dynamic> filteredProducts = productsJson.where((json) {
+          return json['sub_category'] == subcategoryId.toString(); // Match category ID
+        }).toList();
+
+        return filteredProducts.map((json) => Product.fromJson(json)).toList();
+      } else {
+        throw Exception("Failed to load products");
+      }
+    } catch (e) {
+      print("Error fetching products: $e");
+      throw e; // Rethrow the error to be handled in onTap
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,124 +90,68 @@ class CategoryTile extends StatelessWidget {
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8.0),
             child: Image.asset(
-              category.img,
+              widget.category.img,
               width: 50,
               height: 50,
               fit: BoxFit.cover,
-            ), // Display the respective image for each category
+            ),
           ),
           title: Text(
-            category.title,
+            widget.category.title,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          children: category.subcategories.entries.map((entry){
-            String subcategory = entry.key;
-            String subcategoryImage = entry.value;
+          children: widget.category.subcategories.map((subcategory) {
             return ListTile(
-              leading: ClipRRect(borderRadius: BorderRadius.circular(8.0),
-              child: Image.asset(
-                subcategoryImage,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),),
+              leading: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.asset(
+                  subcategory.image,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                ),
+              ),
               title: Text(
-                subcategory,
+                subcategory.name,
                 style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
-              onTap: () {
-                List<Product> products = getStaticProductsForSubcategory(subcategory);
-                //print("Tapped on $subcategory in ${category.title}");
-                Navigator.push(context,
-                MaterialPageRoute(builder:
-                (context) => ProductListPage(
-                  category: category.title,
-                  subcategory: subcategory,
-                  products: products,
-                ),
-                ),
-                );
+              onTap: () async {
+                setState(() {
+                  _isLoading = true; // Start loading
+                });
+                try {
+                  // Fetch products for the selected subcategory
+                  List<Product> products = await _fetchProducts(subcategory.id);
+
+                  // Navigate to the product list page with the fetched products
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CategoryProductList(
+                        category: widget.category.title,
+                        subcategory: subcategory.name,
+                        products: products, categoryId: '',
+                      ),
+                    ),
+                  );
+                } catch (e) {
+                  print('Error fetching products: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Failed to load products')),
+                  );
+                } finally {
+                  setState(() {
+                    _isLoading = false; // End loading
+                  });
+                }
               },
             );
           }).toList(),
         ),
-      ),
-    );
-  }
-  
-  List<Product> getStaticProductsForSubcategory(String subcategory) {
-    Map<String, List<Product>> productData = {
-      "Diamond Rings": [
-        Product(name: "Diamond Ring A", price: 499.99, imageUrl: 'assets/ring.jpg'),
-        Product(name: "Diamond Ring B", price: 599.99, imageUrl: 'assets/ring.jpg'),
-      ],
-      "Gold Rings": [
-        Product(name: "Gold Ring B", price: 399.99, imageUrl: 'assets/ring.jpg'),
-      ],
-      "Platinum Rings": [
-        Product(name: "Platinum Ring A", price: 999.99, imageUrl: 'assets/ring.jpg'),
-      ],
-      "Gold Pendants": [
-        Product(name: "Gold Pendant A", price: 199.99, imageUrl: 'assets/ring.jpg'),
-      ],
-      "Silver Pendants": [
-        Product(name: "Silver Pendant A", price: 99.99, imageUrl: 'assets/ring.jpg'),
-      ],
-      "Diamond Pendants": [
-        Product(name: "Diamond Pendant A", price: 299.99, imageUrl: 'assets/ring.jpg'),
-      ],
-      // Add more products as needed for each subcategory
-    };
-
-    return productData[subcategory] ?? [];
-  }
-
-}
-
-
-class Product {
-  final String name;
-  final double price;
-  final String imageUrl;
-
-  Product({required this.name, required this.price, required this.imageUrl});
-}
-
-// A page to display the list of products for a selected subcategory
-class ProductListPage extends StatelessWidget {
-  final String category;
-  final String subcategory;
-  final List<Product> products;
-
-  const ProductListPage({
-    super.key,
-    required this.category,
-    required this.subcategory,
-    required this.products,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('$subcategory - $category'),
-      ),
-      body: ListView.builder(
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: Image.asset(products[index].imageUrl),
-            title: Text(products[index].name),
-            subtitle: Text('\$${products[index].price.toString()}'),
-            onTap: () {
-              // Optionally navigate to product detail page
-            },
-          );
-        },
       ),
     );
   }

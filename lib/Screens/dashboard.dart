@@ -1,13 +1,12 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:snt_gold_project/Screens/cart.dart';
-import 'package:snt_gold_project/Model/category_model.dart';
-import 'package:snt_gold_project/Screens/favorite.dart';
-import 'package:snt_gold_project/Dashboard/products.dart';
-import 'package:snt_gold_project/Screens/help_screen.dart';
-import 'package:snt_gold_project/Screens/profile_screen.dart';
-import 'package:snt_gold_project/Screens/settings_screen.dart';
-import 'package:snt_gold_project/Screens/shopping.dart';
+import 'package:snt_gold_project/Screens/Bottom%20Navigation%20Screen/cart.dart';
+import 'package:snt_gold_project/Screens/Bottom%20Navigation%20Screen/category_screen.dart';
+import 'package:snt_gold_project/Screens/Bottom%20Navigation%20Screen/home_screen.dart';
+import 'package:snt_gold_project/Screens/Bottom%20Navigation%20Screen/shopping.dart';
+import 'package:snt_gold_project/Screens/Drawer%20Screen/policy_terms_screens.dart';
+import 'package:snt_gold_project/Screens/Drawer%20Screen/help_screen.dart';
+import 'package:snt_gold_project/Screens/Details%20Screen/newProduct_Detailpage.dart';
+import 'package:snt_gold_project/Screens/Bottom%20Navigation%20Screen/profile_screen.dart';
 import 'package:snt_gold_project/Product_List/new_product.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -63,10 +62,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             IconButton(icon: const Icon(Icons.search_rounded, color: Colors.black),onPressed: () {},),
             //IconButton(icon: const Icon(Icons.notifications, color: Colors.black),onPressed: () {},),
             IconButton(icon: const Icon(Icons.favorite_border, color: Colors.black),onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FavoriteScreen())
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => const FavoriteScreen())
+              // );
             },),
           ],
         ),
@@ -127,12 +126,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _selectedIndex = index;
             });
           },
-          children: const [
+          children: const  [
             HomePage(),
             CategoriesPage(),
+            // CategoriesPage(),
             ShoppingPage(),
-            CartPage1(),
-            ProfileScreen(),
+            // ProductDetailPage(productId: 0),
+            // MyApp(),
+            CartPage(cartItems: [],),
+            // CartPage1(),
+            ProfileScreen(userName: 'Guest'),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -162,381 +165,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class PolicyTerms extends StatelessWidget{
-  const PolicyTerms({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Policy Terms'),
-      ),
-      body: const Center(child: Text('Policy Terms', style: TextStyle(fontSize: 24),)),
-    );
-  }
-  
- 
-}
-
-
-class ReportProblemScreen extends StatelessWidget {
-  const ReportProblemScreen({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Report a Problem'),
-      ),
-      body: const Center(
-        child: Text('Report a Problem form will be displayed here.', style: TextStyle(fontSize: 24)),
-      ),
-    );
-  }
-}
-
-
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Search Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade900,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              // child: const TextField(
-              //   decoration: InputDecoration(
-              //     hintText: 'Search By Product, Brand & More..',
-              //     hintStyle: TextStyle(color: Colors.white),
-              //     border: InputBorder.none,
-              //     icon: Icon(Icons.search, color: Colors.white),
-              //   ),
-              // ),
-            ),
-          ),
-
-          // Banner Section
-          CarouselSlider(
-            options: CarouselOptions(
-              height: 180.0,
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 3),
-              viewportFraction: 1.0,
-            ),
-            items: [
-              'assets/banner1.jpeg',
-              'assets/banner2.jpeg',
-              'assets/banner2.jpeg',
-              'assets/banner2.jpeg'
-            ].map((i) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: const BoxDecoration(
-                      color: Color.fromARGB(215, 163, 120, 33),
-                    ),
-                    child: Image.asset(
-                      i,
-                      fit: BoxFit.cover,
-                    ),
-                  );
-                },
-              );
-            }).toList(),
-          ),
-
-          const SizedBox(height: 12),
-          // Categories Section
-          const SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                CategoryItem(label: 'Earrings', assetImage: 'assets/earrings.jpeg'),
-                CategoryItem(label: 'Pendants', assetImage: 'assets/pendant.webp'),
-                CategoryItem(label: 'Rings', assetImage: 'assets/gold_ring.webp'),
-                CategoryItem(label: 'NosePins', assetImage: 'assets/nosepin_gold.png'),
-                CategoryItem(label: 'Bracelets', assetImage: 'assets/bracelet1.png'),
-              ],
-            ),
-          ),
-
-          // Product Photos
-          // const Padding(
-          //   padding: EdgeInsets.all(10.0),
-          //   child: Column(
-          //     crossAxisAlignment: CrossAxisAlignment.start,
-          //     children: [
-          //       Row(
-          //         children: [
-          //           Expanded(
-          //             child: ProductCategory(
-          //               assetImage: 'assets/ring.jpg',
-          //               label: 'Gold Ring',
-          //             ),
-          //           ),
-          //           SizedBox(width: 10),
-          //           Expanded(
-          //             child: ProductCategory(
-          //               assetImage: 'assets/earrings.jpeg',
-          //               label: 'Gold Earring',
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //       SizedBox(height: 10),
-          //       Row(
-          //         children: [
-          //           Expanded(
-          //             child: ProductCategory(
-          //               assetImage: 'assets/pendants.jpeg',
-          //               label: 'Gold Pendant',
-          //             ),
-          //           ),
-          //           SizedBox(width: 10),
-          //           Expanded(
-          //             child: ProductCategory(
-          //               assetImage: 'assets/necklace.jpeg',
-          //               label: 'Gold Chain',
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ],
-          //   ),
-          // ),
-
-          // New arrival Section
-          const Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Text(
-              'New Arrival',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ),
-
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: allnewproducts.length,
-            itemBuilder: (context, index) {
-              final product = allnewproducts[index];
-              return Newproduct(product: product);
-            },
-          ),
-
-          // Recently Viewed Section
-          const Padding(
-            padding: EdgeInsets.all(10.0),
-            child: Text(
-              'Recently Viewed',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ),
-
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 0.7,
-            ),
-            itemCount: 2,
-            itemBuilder: (context, index) {
-              return const ProductItem();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-class CategoriesPage extends StatelessWidget {
-  const CategoriesPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: SearchBar(),
-          ),
-          Expanded(
-            child: CategoryList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-// class ShoppingPage extends StatelessWidget {
-//   const ShoppingPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Card(
-//       elevation: 3,
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Stack(
-//             children: [
-//               Container(
-//                 height: 150,
-//                 decoration: BoxDecoration(
-//                   color: Colors.grey.shade200,
-//                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-//                 ),
-//               ),
-//               Positioned(
-//                 top: 10,
-//                 left: 10,
-//                 child: Container(
-//                   padding: const EdgeInsets.all(4),
-//                   color: Colors.black,
-//                   child: const Text(
-//                     '30% OFF',
-//                     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//           const Padding(
-//             padding: EdgeInsets.all(8.0),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   'Product Name Goes Here',
-//                   style: TextStyle(fontWeight: FontWeight.bold),
-//                 ),
-//                 Text(
-//                   '₹ 25,652',
-//                   style: TextStyle(color: Colors.grey),
-//                 ),
-//                 Text(
-//                   'Women | Diamond Ring',
-//                   style: TextStyle(color: Colors.grey),
-//                 ),
-//               ],
-//             ),
-//           ),
-//           const Padding(
-//             padding: EdgeInsets.all(8.0),
-//             child: Row(
-//               mainAxisAlignment: MainAxisAlignment.end,
-//               children: [
-//                 Icon(Icons.favorite, size: 20, color: Colors.grey),
-//                 SizedBox(width: 4),
-//                 Text('4.7K'),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-class Cart extends StatelessWidget {
-  const Cart({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              // Product Image
-              Image.asset('assets/ring.jpg',
-                width: 80,
-                height: 80,
-              ),
-              const SizedBox(width: 16.0),
-
-              // Product Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Gold Necklace",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Text("\$1500", style: TextStyle(fontSize: 16, color: Colors.amber[600])),
-                  ],
-                ),
-              ),
-
-              // Quantity Selector
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      // Decrease quantity
-                    },
-                    icon: const Icon(Icons.remove),
-                  ),
-                  const Text("1"), // Display quantity
-                  IconButton(
-                    onPressed: () {
-                      // Increase quantity
-                    },
-                    icon: const Icon(Icons.add),
-                  ),
-                ],
-              ),
-
-              // Remove Button
-              IconButton(
-                onPressed: () {
-                  // Remove item from cart
-                },
-                icon: const Icon(Icons.delete, color: Colors.red),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // Category Item  
 class CategoryItem extends StatelessWidget {
+  // final String id;
   final String label;
   final String assetImage;
 
@@ -557,29 +188,29 @@ class CategoryItem extends StatelessWidget {
 }
 
 // Product Category 
-class ProductCategory extends StatelessWidget {
-  final String label;
-  final String assetImage;
+// class ProductCategory extends StatelessWidget {
+//   final String label;
+//   final String assetImage;
 
-  const ProductCategory({super.key, required this.label, required this.assetImage});
+//   const ProductCategory({super.key, required this.label, required this.assetImage});
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(context, 
-        MaterialPageRoute(builder: (context) => const ProductsScreen()),
-        );
-      },
-    child: Column(
-      children: [
-        Image.asset(assetImage, height: 180, fit: BoxFit.fill),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-      ],
-    ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: () {
+//         Navigator.push(context, 
+//         MaterialPageRoute(builder: (context) => const ProductsScreen()),
+//         );
+//       },
+//     child: Column(
+//       children: [
+//         Image.asset(assetImage, height: 180, fit: BoxFit.fill),
+//         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+//       ],
+//     ),
+//     );
+//   }
+// }
 
 // Product Item 
 class Newproduct extends StatelessWidget {
@@ -592,7 +223,7 @@ class Newproduct extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         Navigator.push(context, 
-        MaterialPageRoute(builder: (context) => const ProductsScreen()),
+        MaterialPageRoute(builder: (context) => newProduct_DetailPage(newproductdetail: product)),
         );
       },
       child: Container(
@@ -657,8 +288,7 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, 
-        MaterialPageRoute(builder: (context) => const ProductsScreen()),
+        Navigator.pop(context, 
         );
       },
       child :Container(

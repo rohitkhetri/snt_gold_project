@@ -2,181 +2,159 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:snt_gold_project/Product_List/all_products.dart'; // Ensure this path is correct
-
-class FilterScreen extends StatefulWidget {
-  final List<Product> allProducts;
-  final Function(List<Product>) onFiltersApplied;
-  const FilterScreen({super.key, required this.allProducts, required this.onFiltersApplied});
+class FilterPage extends StatefulWidget {
+  const FilterPage({super.key});
 
   @override
-  _FilterScreenState createState() => _FilterScreenState();
+  _FilterPageState createState() => _FilterPageState();
 }
 
-class _FilterScreenState extends State<FilterScreen> {
-  final List<String> categories = [
-    "Price",
-    "Brands",
-    "Size",
-    "Weight",
-    "Category",
-    "Subcategory"
-  ];
+class _FilterPageState extends State<FilterPage> {
+  List<String> selectedBrands = [];
+  List<String> selectedSizes = [];
+  List<String> selectedWeights = [];
+  List<String> selectedCategories = [];
+  List<String> selectedSubcategories = [];
+  Map<String, dynamic> filterData = {};
+  List<dynamic> filteredProducts = []; // List to hold the filtered products
+  bool isLoading = true; // Loading state
 
-  Map<String, List<String>> subcategories = {
-    "Price": ["0-10000", "10000 - 20000", "20000 - 30000", "30000 - 40000", "40000 - 50000", "Above 50000"],
-    "Brands": ["1"], // Replace with actual brand names
-    "Size": ["1","2"], // Replace with actual size options
-    "Weight": ["1","2"], // Replace with actual weight options
-    "Category": ["3", "2", "1"], // Replace with actual category options
-    "Subcategory": ["8", "7", "2", "5", "6", "11", "3", "4", "1"], // Replace with actual subcategory options
-  };
+  @override
+  void initState() {
+    super.initState();
+    fetchFilterOptions();
+  }
 
-  String selectedCategory = "Price"; // Default to Price
-  Map<String, Set<String>> selectedSubcategories = {
-    "Price": {},
-    "Brands": {},
-    "Size": {},
-    "Weight": {},
-    "Category": {},
-    "Subcategory": {},
-  };
+  Future<void> fetchFilterOptions() async {
+    final response = await http.get(
+      Uri.parse('https://sntgold.microlanpos.com/api/filter-product-page'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-  bool _isLoading = true;
-
-  // Function to apply filters and fetch filtered products
-  Future<void> _fetchFilters() async {
-    const url = 'https://sntgold.microlanpos.com/api/filter-product-page';
-
-    try {
-      final response = await http.get(
-        Uri.parse(url),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body)['for_filter_product_data'];
-        setState(() {
-          // Map the response to the subcategories
-          subcategories = {
-            "Price": jsonData['price'].map<String>((item) => item.toString()).toList(),
-            "Brands": jsonData['brand'].map<String>((item) => item['name']).toList(),
-            "Size": jsonData['carat'].map<String>((item) => item['name']).toList(),
-            "Weight": jsonData['weight'].map<String>((item) => item['name']).toList(),
-            "Category": jsonData['category'].map<String>((item) => item['name']).toList(),
-            "Subcategory": jsonData['subcategory'].map<String>((item) => item['subcategories']).toList(),
-          };
-          _isLoading = false; // Set loading to false
-        });
-      } else {
-        throw Exception('Failed to load filters: ${response.statusCode}');
-      }
-    } catch (e) {
+    if (response.statusCode == 200) {
       setState(() {
-        _isLoading = false; // Set loading to false on error
+        filterData = json.decode(response.body)['for_filter_product_data'];
+        isLoading = false; // Stop loading after fetching options
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } else {
+      throw Exception('Failed to load filter options');
     }
-    
   }
 
-  void applyFilters() {
-    // Implement your filter application logic here
-    print("Filters applied: $selectedSubcategories");
+  Future<void> applyFilters() async {
+    final filterRequestData = {
+      "brand": selectedBrands,
+      "size": selectedSizes,
+      "weight": selectedWeights,
+      "category": selectedCategories,
+      "subcategory": selectedSubcategories,
+      "below10000": "10000",
+      "10k_20K": "10000-20000",
+      "20k_30K": "20000-30000",
+      "30k_40K": "30000-40000",
+      "40k_50K": "40000-50000",
+      "above50000": "50000",
+      "sortBy": "atoz",
+    };
+
+    final response = await http.post(
+      Uri.parse('https://sntgold.microlanpos.com/api/filter-all-product'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(filterRequestData),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        filteredProducts = json
+            .decode(response.body); // Update the list with filtered products
+      });
+    } else {
+      throw Exception('Failed to apply filters');
+    }
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Filters'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(
-              child: Row(
+      appBar: AppBar(title: const Text('Filter Products')),
+      body: Column(
+        children: [
+          // Filters
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  Expanded(
-                    flex: 2,
-                    child: ListView(
-                      children: categories.map((category) {
-                        return ListTile(
-                          title: Text(
-                            category,
-                            style: TextStyle(
-                              fontWeight: selectedCategory == category
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              fontSize: 16,
-                            ),
-                          ),
-                          selected: selectedCategory == category,
-                          onTap: () {
-                            setState(() {
-                              selectedCategory = category; // Update selected category
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 5,
-                    child: ListView(
-                      children: subcategories[selectedCategory]!.map((subcategory) {
-                        return CheckboxListTile(
-                          title: Text(subcategory),
-                          value: selectedSubcategories[selectedCategory]!.contains(subcategory),
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value!) {
-                                selectedSubcategories[selectedCategory]!.add(subcategory);
-                              } else {
-                                selectedSubcategories[selectedCategory]!.remove(subcategory);
-                              }
-                            });
-                          },
-                        );
-                      }).toList(),
-                    ),
+                  // Categories
+                  buildDropdownFilter(
+                      'Categories', filterData['category'], selectedCategories),
+                  // Subcategories
+                  buildDropdownFilter('Subcategories',
+                      filterData['subcategory'], selectedSubcategories),
+                  // Brands
+                  buildDropdownFilter(
+                      'Brands', filterData['brand'], selectedBrands),
+                  // Sizes
+                  buildDropdownFilter(
+                      'Sizes', filterData['carat'], selectedSizes),
+                  // Weights
+                  buildDropdownFilter(
+                      'Weights', filterData['weight'], selectedWeights),
+                  ElevatedButton(
+                    onPressed: applyFilters,
+                    child: const Text('Apply Filters'),
                   ),
                 ],
               ),
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () {
-                      setState(() {
-                        // Reset all selections
-                        selectedSubcategories.forEach((key, value) {
-                          value.clear();
-                        });
-                      });
+          ),
+          // Display filtered products
+          Expanded(
+            child: filteredProducts.isNotEmpty
+                ? ListView.builder(
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = filteredProducts[index];
+                      return ListTile(
+                        title: Text(product['name'] ?? 'Unnamed Product'),
+                        subtitle: Text(
+                            'Price: ${product['price'] ?? 'N/A'}'), // Replace with actual price field
+                        leading: product['image'] != null
+                            ? Image.network(product[
+                                'image']) // Replace with actual image field
+                            : const Icon(Icons.image_not_supported),
+                      );
                     },
-                    child: const Text("Reset"),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _fetchFilters();
-                      Navigator.pop(context); // Call the apply filters function
-                    },
-                    child: const Text("Apply Filter"),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+                  )
+                : const Center(child: Text('No products found')),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget buildDropdownFilter(
+      String title, List<dynamic> options, List<String> selectedOptions) {
+    return ExpansionTile(
+      title: Text(title),
+      children: options.map((option) {
+        return CheckboxListTile(
+          title: Text(option['name'] ?? 'Unknown'),
+          value: selectedOptions.contains(option['id'].toString()),
+          onChanged: (isSelected) {
+            setState(() {
+              if (isSelected!) {
+                selectedOptions.add(option['id'].toString());
+              } else {
+                selectedOptions.remove(option['id'].toString());
+              }
+            });
+          },
+        );
+      }).toList(),
     );
   }
 }

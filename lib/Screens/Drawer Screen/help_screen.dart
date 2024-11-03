@@ -32,7 +32,8 @@ class HelpScreen extends StatelessWidget {
               // Navigate to Contact Support screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ContactSupportScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const ContactSupportScreen()),
               );
             },
           ),
@@ -44,7 +45,8 @@ class HelpScreen extends StatelessWidget {
               // Navigate to Report Problem screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ReportProblemScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const ReportProblemScreen()),
               );
             },
           ),
@@ -65,7 +67,10 @@ class HelpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHelpOption(BuildContext context, {required String title, required IconData icon, required VoidCallback onTap}) {
+  Widget _buildHelpOption(BuildContext context,
+      {required String title,
+      required IconData icon,
+      required VoidCallback onTap}) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
@@ -89,7 +94,8 @@ class FAQScreen extends StatelessWidget {
         title: const Text('Frequently Asked Questions'),
       ),
       body: const Center(
-        child: Text('List of FAQs will be displayed here.', style: TextStyle(fontSize: 24)),
+        child: Text('List of FAQs will be displayed here.',
+            style: TextStyle(fontSize: 24)),
       ),
     );
   }
@@ -106,7 +112,8 @@ class ContactSupportScreen extends StatelessWidget {
         title: const Text('Contact Support'),
       ),
       body: const Center(
-        child: Text('Contact Support information will be displayed here.', style: TextStyle(fontSize: 24)),
+        child: Text('Contact Support information will be displayed here.',
+            style: TextStyle(fontSize: 24)),
       ),
     );
   }
@@ -123,7 +130,8 @@ class ReportProblemScreen extends StatelessWidget {
         title: const Text('Report a Problem'),
       ),
       body: const Center(
-        child: Text('Report a Problem form will be displayed here.', style: TextStyle(fontSize: 24)),
+        child: Text('Report a Problem form will be displayed here.',
+            style: TextStyle(fontSize: 24)),
       ),
     );
   }
@@ -140,7 +148,8 @@ class FeedbackScreen extends StatelessWidget {
         title: const Text('App Feedback'),
       ),
       body: const Center(
-        child: Text('Feedback form will be displayed here.', style: TextStyle(fontSize: 24)),
+        child: Text('Feedback form will be displayed here.',
+            style: TextStyle(fontSize: 24)),
       ),
     );
   }

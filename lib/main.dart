@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:snt_gold_project/Provider/cart_provider.dart';
 import 'package:snt_gold_project/Provider/favoriteProvider.dart';
-import 'package:snt_gold_project/Screens/dashboard.dart';
+import 'package:snt_gold_project/Provider/ordersProvider.dart';
 import 'package:snt_gold_project/Screens/splash_screen.dart';
 
 void main() {
   runApp(
     MultiProvider(
-      providers:[
+      providers: [
         ChangeNotifierProvider(create: (context) => CartProvider()),
         ChangeNotifierProvider(create: (context) => Favoriteprovider()),
-    ],
-    child: const MyApp(),
+        ChangeNotifierProvider(create: (context) => OrderProvider()),
+      ],
+      child: const MyApp(),
     ),
   );
 }
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const DashboardScreen(),
+      home: const SplashScreen(),
     );
   }
 }

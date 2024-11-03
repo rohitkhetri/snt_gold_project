@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:snt_gold_project/Product_List/all_products.dart';
+import 'package:snt_gold_project/Product_List/all_product_modelclass.dart';
 
 class Favoriteprovider with ChangeNotifier {
-  final List<Product> _favoriteProducts = []; 
+  final List<Product> _favoriteProducts = [];
 
   bool isFavorite(Product product) {
     return _favoriteProducts.contains(product);
   }
-
 
   void addFavorite(Product product) {
     if (!_favoriteProducts.contains(product)) {
@@ -18,7 +17,7 @@ class Favoriteprovider with ChangeNotifier {
 
   void removeFavorite(Product product) {
     _favoriteProducts.remove(product);
-    notifyListeners(); 
+    notifyListeners();
   }
 
   List<Product> get favoriteProducts => _favoriteProducts;

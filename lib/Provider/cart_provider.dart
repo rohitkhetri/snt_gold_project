@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:snt_gold_project/Product_List/all_products.dart';
-
-class CartProduct {
-  final Product product;
-  final String? selectedSize;
-  final String? selectedCarat;
-  final String? selectedWeight;
-  final String price;
-
-  CartProduct({
-    required this.product,
-    this.selectedSize,
-    this.selectedCarat,
-    this.selectedWeight,
-    required this.price,
-  });
-}
+import 'package:snt_gold_project/Product_List/all_product_modelclass.dart';
 
 class CartProvider with ChangeNotifier {
-  List<CartProduct> _cartItems = [];
+  final List<Product> _cartItems = [];
 
-  List<CartProduct> get cartItems => _cartItems;
+  List<Product> get cartItems => _cartItems;
 
-  void addToCart(CartProduct cartProduct) {
-    _cartItems.add(cartProduct);
+  void addToCart(Product product) {
+    _cartItems.add(product);
+    notifyListeners(); // Notify listeners to rebuild the UI
+  }
+
+//   double get totalAmount {
+//   return _cartItems.fold(0, (sum, item) => sum + (item.sizeWisePrice ?? 0) * (item.quantity ?? 1));
+// }
+
+  void updateQuantity(Product product, int newQuantity) {
+    final index = _cartItems.indexOf(product);
+    if (index != -1) {
+      _cartItems[index].quantity =
+          newQuantity; // Adjust this based on your Product class
+      notifyListeners();
+    }
+  }
+
+  void removeFromCart(Product product) {
+    _cartItems.remove(product);
     notifyListeners();
   }
 
-  void removeFromCart(CartProduct cartProduct) {
-    _cartItems.remove(cartProduct);
+  void clearCart() {
+    _cartItems.clear();
     notifyListeners();
   }
 }

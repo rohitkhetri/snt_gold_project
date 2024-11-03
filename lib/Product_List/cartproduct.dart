@@ -1,4 +1,3 @@
-
 class CartProduct {
   final int productId;
   final int quantity;
@@ -21,4 +20,3 @@ class CartProduct {
     );
   }
 }
-

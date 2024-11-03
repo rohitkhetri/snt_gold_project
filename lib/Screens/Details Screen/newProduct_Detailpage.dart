@@ -34,10 +34,10 @@ class _ProductDetailPageState extends State<newProduct_DetailPage> {
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           );
         case "Description":
-          // return Text(
-          //   widget.newproductdetail.description, // Use actual description from NewProduct
-          //   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          // );
+        // return Text(
+        //   widget.newproductdetail.description, // Use actual description from NewProduct
+        //   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+        // );
         case "Specifications":
           return Text(
             "Specifications here", // Add your specifications logic
